@@ -16,10 +16,17 @@ Go back to dashboard
 - From dashboard, go to `API` and then to `Credentials`
 - Press `Create Credentials` and choose `OAuth client ID`
 - Feel up the form
-- Add `URI` for `Authorized redirect URIs`, otherwise it won't work:
- 
-  ```http://localhost/callback```
-  After saving, download the credentials into json format and paste it into project folder
-
-
+- Add `URI` ('http://localhost/callback ') for `Authorized redirect URIs`, otherwise it won't work.
+- After saving, download the credentials into json format and paste it into project folder
+<!-- -->
   Credit for this repo: https://www.youtube.com/watch?v=n4e3Cy2Tq3Q
+
+  ### How to run
+  Build the docker image
+  ```bash
+  docker-compose build
+  ```
+  Start the container
+  ```bash
+  docker-compose up
+  ```

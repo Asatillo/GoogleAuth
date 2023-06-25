@@ -15,10 +15,10 @@ app.secret_key = secrets.client_secret
 
 os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = "1"
 
-client_secret_file = os.path.join(pathlib.Path(__file__).parent, "client_secret.json")
+client_secrets_file = os.path.join(pathlib.Path(__file__).parent, "client_secret.json")
 
-flow = Flow.from_client_secret_file(
-    client_secret_file=client_secret_file,
+flow = Flow.from_client_secrets_file(
+    client_secrets_file=client_secrets_file,
     scopes=["https://www.googleapis.com/auth/userinfo.profile", "https://www.googleapis.com/auth/userinfo.email", "openid"],
     redirect_uri="http://localhost/callback"
 )
@@ -29,7 +29,7 @@ def login_is_required(function):
             return abort(401) #Authorization required
         else:
             return function()
-    
+
     return wrapper
 
 @app.route('/login')
@@ -41,14 +41,13 @@ def login():
 @app.route('/callback')
 def callback():
     flow.fetch_token(authorization_response=request.url)
-
-    if not session["state"] == request.args["state"]:
+    if not session["state"] == request.args.get["state"]:
         abort(500) # State doesn't match
 
     credentials = flow.credentials
-    request_session = request.session()
+    request_session = requests.session()
     cached_session = cachecontrol.CacheControl(request_session)
-    token_request = google.auth.transport.requests.Requests(session=cached_session)
+    token_request = google.auth.transport.requests.Request(session=cached_session)
 
     id_info = id_token.verify_oauth2_token(
         id_token=credentials._id_token,
@@ -67,7 +66,7 @@ def logout():
 
 @app.route('/')
 def index():
-    return "Hello World <a href='login'><button>Login</button></a>"
+    return "Hello World <a href='/login'><button>Login</button></a>"
 
 @app.route('/protected_area')
 @login_is_required
